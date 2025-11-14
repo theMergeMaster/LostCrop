@@ -58,12 +58,13 @@ class LostCrop:
         if not hasattr(COMMANDS, cmd):
             print("Comando no reconocido. Usa /help para listar los comandos disponibles")
             return self.help()
-        method_name = getattr(self, cmd)
 
-        try:
-            if method_name == "exit":
+        if cmd == "exit":
                 EXIT = True
                 return ""
+
+        try:
+            method_name = getattr(self, cmd)
 
             # Check args
             expected_params = sum(1 for p in getattr(COMMANDS, cmd) if not p.startswith("_"))
@@ -258,7 +259,7 @@ class LostCrop:
         """
         interface = ""
         command_names = (
-            [command_name] 
+            [command_name]
             if isinstance(command_name, str)
             else [cmd for cmd in dir(COMMANDS) if not cmd.startswith("_")]
         )
