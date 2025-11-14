@@ -1,0 +1,49 @@
+{
+    "check_server_status": {
+        "_alias": "css",
+        "_description": "Comprueba si el servidor está activo.",
+        "server_name": {
+            "required": 1,
+            "_description": "Nombre del servidor a comprobar."
+        },
+        "version": {
+            "required": 0,
+            "_description": "Versión de Minecraft en la que está el server.\nPuede ser Java o Bedrock (Java por defecto)."
+        }
+    },
+    "check_cur_players": {
+        "_alias": "ccp",
+        "_description": "Devuelve la cantidad de jugadores conectados.",
+        "server_name": {
+            "required": 1,
+            "_description": "Nombre del servidor que comprobar."
+        },
+        "version": {
+            "required": 0,
+            "_description": "Versión de Minecraft en la que está el server.\nPuede ser Java o Bedrock\nJava por defecto."
+        }
+    },
+    "save_coords": {
+        "_alias": "sac",
+        "_description": "Guarda las coordenadas deseadas en un Google Sheets.",
+        "coords": {
+            "structure": [-1, -1, -1],
+            "required": 1,
+            "_description": "Coordenadas a almacenar (X, Y, Z). El eje Y es opcional."
+        },
+        "page_no": {
+            "required": 1,
+            "_description": "Página en la que almacenar la coordenada, siendo:\n1 -> overworld, 2 -> nether, 3 -> end, n -> hojas temporales.\n1 por defecto"
+        }
+    },
+    "help": {
+        "_description": "Muestra información de un comando específico o de todos.",
+        "command_name": {
+            "required": 0,
+            "_description": "Nombre del comando a consultar. Si no se incluye, se mostrará una breve descripción del proyecto, así como un listado de los comandos disponibles con sus respectivas descripciones."
+        }
+    },
+    "exit": {
+        "_description": "Comando para finalizar el programa."
+    }
+}
