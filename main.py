@@ -18,7 +18,9 @@ SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 EXIT = False
 
 # Initialize commands
-if not (commands_file := os.path.join(os.curdir, 'res/commands.json')) and os.path.isfile(commands_file):
+if not (
+    commands_file := os.path.join(os.curdir, "res/commands.json")
+) and not os.path.isfile(commands_file):
     print("Error al obtener los comandos.")
     exit()
 
@@ -48,35 +50,62 @@ class LostCrop:
 
     def _proccess_commands(self, command: str) -> str:
         global EXIT
-        if not command.startswith("/"):
+
+        # Check length of command
+        if len(command) < 1:
             return "Comando no reconocido. Prueba a usarlo con \"/\""
 
         command = command.removeprefix("/")
-        command_partition = command.split(" ")
-        
-        if not hasattr(COMMANDS, command_partition[0]):
+        cmd, *params = command.split(" ") # command_name [param1, param2, ...]
+
+        if not hasattr(COMMANDS, cmd):
             print("Comando no reconocido. Usa /help para listar los comandos disponibles")
             return self.help()
-        cmd = getattr(LostCrop, command_partition[0])
+        method_name = getattr(LostCrop, cmd)
 
         try:
-            if cmd == "exit":
+            if method_name == "exit":
                 EXIT = True
                 return ""
-            cmd_args_names = [p for p in getattr(COMMANDS, command_partition[0]) if not p.startswith("_")]
 
-            if len(command_partition[1:]) > len(cmd_args_names):
-                return "Demasiados argumentos"
-            if not command_partition[1:] and len(cmd_args_names):
-                return "Faltan args" #TODO Devolver self.help(command_partition[0])
-            
-            return cmd(command_partition[1:])
+            # Check args
+            expected_params = sum(1 for p in getattr(COMMANDS, cmd) if not p.startswith("_"))
+            if len(params) > expected_params:
+                print("Too many args. Expected:\n")
+                return self.help(cmd)
+            if not params and expected_params:
+                print("Missing args:\n")
+                return self.help(cmd)
+
+            return method_name(params)
         except Exception as e:
             return f"Error al ejecutar el comando {cmd}: {e}"
 
 
-    def _process_params(self, params: dict):
-        pass
+    def _process_params(self, params: dict) -> str:
+        """
+        param 	:   description | required
+        param2 	:   description | optional
+        param3 	:   description | required
+            structure   :   [-1, -1, -1]
+
+        Parameters
+        ----------
+        params : dict
+            _description_
+        """
+        interface = "Parameters\n----------\n"
+        for key, value in params.items():
+            interface += (
+                f"{key}   :   {value['_description']} | "
+                f"{'required' if value['required'] > 0 else 'optional'}"
+                f"\n"
+            )
+
+            if structure := value.get("structure"):
+                interface += f"\n\tstructure    :   {structure}\n"
+
+        return interface
 
 
     def _get_spreadsheet(self, spreadsheet_name: str, page_no: int) -> gspread.worksheet.Worksheet | None:
@@ -177,7 +206,7 @@ class LostCrop:
 
         input(f"{server_name = }\n{m_version = }")
         return "OK"
-    
+
         try:
             server = self._get_mc_version(m_version)
             if not server:
@@ -196,7 +225,7 @@ class LostCrop:
     def save_coords(self, coords: list[str], page_no: int = 1) -> str:
         input(f"{coords = }\n{page_no = }")
         return "OK"
-    
+
         try:
             sheet = self._get_spreadsheet(spreadsheet_name="", page_no=page_no)
             if not sheet:
@@ -232,34 +261,31 @@ class LostCrop:
             Interfaz informativa o error en su defecto
         """
 
-        input(f"{command_name = }")
-        return "OK"
-    
         interface = ""
         command_names = (
-            [getattr(COMMANDS, command_name)]
-            if command_name
-            else inspect.getmembers(COMMANDS)
+            [command_name]
+            if command_name and command_name != "help"
+            else [cmd for cmd in dir(COMMANDS) if not cmd.startswith("_")]
         )
 
         try:
             for command in command_names:
-                interface += command
+                command_attrs: dict = getattr(COMMANDS, command)
+                interface += str(command)
 
                 # Alias + Description
-                if (alias := getattr(command, "_alias")):
-                    interface += f" | {alias}"
-                interface += f" : {getattr(command, '_description')}\n\n"
+                if (alias := command_attrs.get("_alias")):
+                    interface += f" | {alias}\n"
+                interface += f"     {command_attrs.get('_description')}\n\n"
 
                 # Params
-                if (params := [
-                    p for p in inspect.getmembers(command) if not p[0].startswith("_")
-                ]):
+                if params := {k: v for k, v in command_attrs.items() if isinstance(v, dict)}:
                     interface += self._process_params(params)
+                interface += "\n\n"
         except Exception as e:
             return (
-                f"Error al obtener información acerca de "
-                f"{'el comando ' + command_name if command_name else 'los comandos'}: {e}"
+                "Error al obtener información acerca de"
+                f"{'l comando ' + command_name if command_name else ' los comandos'}: {e}"
             )
 
         return interface
@@ -270,13 +296,9 @@ def main():
     global EXIT
     app = LostCrop()
 
-    print("=== LostCrop CLI ===")
-
     while not EXIT:
         command = input("> ")
         print(app._proccess_commands(command=command))
-
-    print("Final de programa")
 
 
 if __name__ == "__main__":
