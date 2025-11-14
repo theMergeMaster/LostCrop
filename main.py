@@ -1,6 +1,4 @@
-import inspect
 import json
-import logging
 import os
 from types import SimpleNamespace
 from typing import Type, Union
@@ -8,7 +6,6 @@ from typing import Type, Union
 import gspread
 from google.oauth2.service_account import Credentials
 from mcstatus import BedrockServer, JavaServer
-
 
 # MC config
 MC_VERSIONS = {1: JavaServer, 2: BedrockServer}
@@ -52,7 +49,7 @@ class LostCrop:
         global EXIT
 
         # Check length of command
-        if len(command) < 1:
+        if len(command) < 1 or not command.startswith("/"):
             return "Comando no reconocido. Prueba a usarlo con \"/\""
 
         command = command.removeprefix("/")
@@ -61,7 +58,7 @@ class LostCrop:
         if not hasattr(COMMANDS, cmd):
             print("Comando no reconocido. Usa /help para listar los comandos disponibles")
             return self.help()
-        method_name = getattr(LostCrop, cmd)
+        method_name = getattr(self, cmd)
 
         try:
             if method_name == "exit":
@@ -77,7 +74,7 @@ class LostCrop:
                 print("Missing args:\n")
                 return self.help(cmd)
 
-            return method_name(params)
+            return method_name(*params)
         except Exception as e:
             return f"Error al ejecutar el comando {cmd}: {e}"
 
@@ -236,8 +233,7 @@ class LostCrop:
         except Exception as e:
             return f"Error guardando coordenadas: {e}"
 
-
-    def help(self, command_name: str = "") -> str:
+    def help(self, command_name: Union[str, list] = "") -> str:
         """
         Mostrar información de un comando o de todos
 
@@ -260,17 +256,18 @@ class LostCrop:
         str
             Interfaz informativa o error en su defecto
         """
-
         interface = ""
         command_names = (
-            [command_name]
-            if command_name and command_name != "help"
+            [command_name] 
+            if isinstance(command_name, str)
             else [cmd for cmd in dir(COMMANDS) if not cmd.startswith("_")]
         )
 
         try:
             for command in command_names:
-                command_attrs: dict = getattr(COMMANDS, command)
+                command_attrs = getattr(COMMANDS, command, None)
+                if not command_attrs:
+                    return f"No se ha encontrado ayuda para el comando {command}"
                 interface += str(command)
 
                 # Alias + Description
@@ -283,6 +280,9 @@ class LostCrop:
                     interface += self._process_params(params)
                 interface += "\n\n"
         except Exception as e:
+            command_name = (
+                command_name[0] if isinstance(command_name, list) else command_name
+            )
             return (
                 "Error al obtener información acerca de"
                 f"{'l comando ' + command_name if command_name else ' los comandos'}: {e}"
