@@ -5,3 +5,64 @@
 - Procesar aliases de los comandos para ser usados
 - Response de los comandos como str o dict o tuple?
 - Método interno para procesar los parámetros de cada comando
+
+
+
+
+interfaz comandos
+import shutil
+from typing import List
+
+
+class AsciiUI:
+    def __init__(self):
+        self.cols, _ = shutil.get_terminal_size()
+
+    def _line(self, char: str, width: int = None) -> str:
+        width = width or self.cols
+        return char * width
+
+    def box(self, title: str = "", body: List[str] = None, width: int = None) -> str:
+        width = width or self.cols
+        body = body or []
+
+        # Ajuste del texto
+        title = f" {title} " if title else ""
+
+        # Build
+        top_border = "+" + self._line("=", width - 2) + "+"
+
+        title_line = ""
+        if title:
+            title_line = "|" + title.center(width - 2) + "|\n"
+            sep = "+" + self._line("=", width - 2) + "+"
+        else:
+            sep = "+" + self._line("-", width - 2) + "+"
+
+        body_lines = ""
+        for line in body:
+            body_lines += "|" + line.ljust(width - 2)[:width - 2] + "|\n"
+
+        bottom_border = "+" + self._line("-", width - 2) + "+"
+
+        if title:
+            return top_border + "\n" + title_line + sep + "\n" + body_lines + bottom_border
+        else:
+            return top_border + "\n" + body_lines + bottom_border
+
+    def panel(self, items: List[str], width: int = None) -> str:
+        width = width or self.cols
+        out = ""
+
+        for item in items:
+            out += "+" + self._line("-", width - 2) + "+\n"
+            out += "|" + item.ljust(width - 2)[:width - 2] + "|\n"
+
+        out += "+" + self._line("-", width - 2) + "+"
+
+        return out
+
+    def separator(self, is_title=False, width: int = None) -> str:
+        width = width or self.cols
+        char = "=" if is_title else "-"
+        return "+" + self._line(char, width - 2) + "+"
