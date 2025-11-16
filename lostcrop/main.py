@@ -1,6 +1,3 @@
-def main():
-    print("Hello from lostcrop!")
+from commands import init_console
 
-
-if __name__ == "__main__":
-    main()
+init_console()

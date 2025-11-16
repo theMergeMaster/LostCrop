@@ -8,7 +8,7 @@
         },
         "version": {
             "required": 0,
-            "_description": "Versión de Minecraft en la que está el server.\nPuede ser Java o Bedrock (Java por defecto)."
+            "_description": "Versión de Minecraft en la que está el server.\n\tPuede ser Java o Bedrock (Java por defecto)."
         }
     },
     "check_cur_players": {
@@ -20,7 +20,7 @@
         },
         "version": {
             "required": 0,
-            "_description": "Versión de Minecraft en la que está el server.\nPuede ser Java o Bedrock\nJava por defecto."
+            "_description": "Versión de Minecraft en la que está el server.\n\tPuede ser Java o Bedrock (Java por defecto)."
         }
     },
     "save_coords": {
@@ -32,15 +32,26 @@
             "_description": "Coordenadas a almacenar (X, Y, Z). El eje Y es opcional."
         },
         "page_no": {
-            "required": 1,
-            "_description": "Página en la que almacenar la coordenada, siendo:\n1 -> overworld, 2 -> nether, 3 -> end, n -> hojas temporales.\n1 por defecto"
+            "required": 0,
+            "_description": "Página en la que almacenar la coordenada, siendo:\n\t1 -> overworld, 2 -> nether, 3 -> end, n -> hojas temporales."
         }
     },
     "help": {
         "_description": "Muestra información de un comando específico o de todos.",
+        "arguments": {
+            "--help": {
+                "required": 0,
+                "_description": "Mostrar información acerca de este comando."
+            },
+            "--lang": {
+                "possible_values": ["es", "en"],
+                "required": 0,
+                "_description": "Lenguaje en el que se muestra la información de los comandos."
+            }
+        },
         "command_name": {
             "required": 0,
-            "_description": "Nombre del comando a consultar. Si no se incluye, se mostrará una breve descripción del proyecto, así como un listado de los comandos disponibles con sus respectivas descripciones."
+            "_description": "Nombre del comando a consultar. Si no se incluye, se mostrará una breve descripción del proyecto,\n\tasí como un listado de los comandos disponibles con sus respectivas descripciones."
         }
     },
     "exit": {

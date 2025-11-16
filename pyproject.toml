@@ -24,6 +24,13 @@ dependencies = [
     "setuptools==80.9.0",
     "urllib3==2.5.0",
 ]
-lint = [
-    "ruff"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "B", "UP", "I", "C", "D",  "I", "N"]
+ignore = ["D104", "D100"]
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.4.0",
+    "ruff>=0.14.5",
 ]
