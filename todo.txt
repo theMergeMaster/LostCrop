@@ -1,7 +1,0 @@
-- Devolver en check_cur_players de forma opcional el nombre de los jugadores conectados
-- Métodos crud para Excel
-- Anglicizar código
-- Procesar main
-- Procesar aliases de los comandos para ser usados
-- Response de los comandos como str o dict o tuple?
-- Método interno para procesar los parámetros de cada comando

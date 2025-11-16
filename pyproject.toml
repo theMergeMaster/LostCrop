@@ -1,0 +1,36 @@
+[project]
+name = "lostcrop"
+version = "0.1.0"
+description = "Client-side terminal designed to manage your Minecraft servers"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "asyncio-dgram==2.2.0",
+    "cachetools==6.2.2",
+    "certifi==2025.11.12",
+    "charset-normalizer==3.4.4",
+    "dnspython==2.8.0",
+    "google-auth==2.43.0",
+    "google-auth-oauthlib==1.2.2",
+    "gspread==6.2.1",
+    "idna==3.11",
+    "mcstatus==12.0.6",
+    "oauthlib==3.3.1",
+    "pyasn1==0.6.1",
+    "pyasn1-modules==0.4.2",
+    "requests==2.32.5",
+    "requests-oauthlib==2.0.0",
+    "rsa==4.9.1",
+    "setuptools==80.9.0",
+    "urllib3==2.5.0",
+]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "B", "UP", "I", "C", "D",  "I", "N"]
+ignore = ["D104", "D100"]
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.4.0",
+    "ruff>=0.14.5",
+]

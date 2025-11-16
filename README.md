@@ -1,17 +1,54 @@
 # Lost Crop
 
-## Descripción
-    Lost Crop es un proyecto creado para ver y configurar de forma cómoda mediante terminal un servidor de Minecraft.
+Client-side terminal designed to manage your Minecraft servers
 
 
-## Funcionalidades:
-    - Comprobar si un servidor de Minecraft está activo
-    - Ver la lista de jugadores conectados
-    - Guardar coordenadas o datos en una hoja de Google Sheets
+## What can you do
 
-## Casos de uso
-```bash
-    python mi_python.py check_server_status servidor.aternos.me
-    python mi_python.py check_cur_players servidor.aternos.me
-    python mi_python.py save_coords "x=128, y=64, z=-54"
+- Check the current status of the server
+- Check how many players are connected and their names (WIP)
+- Save, override, delete coords into a Google Sheets (WIP)
+- Review all the commands you are allowed to use in a beautiful format (WIP)
+
+
+## Dependencies
+```
+asyncio-dgram
+cachetools
+certifi
+charset-normalizer
+dnspython
+google-auth
+google-auth-oauthlib
+gspread
+idna
+mcstatus
+oauthlib
+pyasn1
+pyasn1-modules
+requests
+requests-oauthlib
+rsa
+setuptools
+urllib3
+```
+
+### Adding dependencies
+```sh
+uv add httpx
+```
+or
+```sh
+uv add -r requirements.txt --active
+```
+
+### Lock dependencies
+```sh
+uv lock
+```
+
+
+## How to run locally
+```sh
+uv run lostcrop/main.py 
 ```
