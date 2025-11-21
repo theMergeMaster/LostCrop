@@ -1,7 +1,9 @@
+import csv
 import json
 import os
-from pathlib import Path
 import sys
+from enum import IntEnum
+from pathlib import Path
 from types import SimpleNamespace
 
 import gspread
@@ -9,9 +11,40 @@ from google.oauth2.service_account import Credentials
 from mcstatus import BedrockServer, JavaServer
 
 # region Config
+
+# TODO init .lostcrop path
+COORDS_CSV_PATH = Path.home() / ".lostcrop" / "coords.csv"
+
 # Minecraft
-MC_VERSIONS = {1: JavaServer, 2: BedrockServer}
-WORLD_PAGES = {0: "overworld", 1: "nether", 2: "end"}
+
+class Version(IntEnum):
+    JAVA = 0
+    BEDROCK = 1
+
+    def as_class(self):
+        if self is Version.JAVA:
+            return JavaServer
+
+        if self is Version.BEDROCK:
+            return BedrockServer
+
+
+class Dimension(IntEnum):
+    OVERWORLD = 0
+    NETHER = 1
+    END = 2
+
+
+    def __str__(self):
+        if self is Dimension.OVERWORLD:
+            return "Overworld"
+
+        if self is Dimension.NETHER:
+            return "Nether"
+
+        if self is Dimension.END:
+            return "End"
+
 
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 EXIT = False
@@ -37,12 +70,8 @@ if not (
 try:
     commands = {}
     with open(commands_file, encoding="utf-8") as f:
-        try:
-            commands = json.load(f)
-        except Exception:
-            pass
-        finally:
-            f.close()
+        commands = json.load(f)
+
     COMMANDS = SimpleNamespace(**commands)
 except Exception as e:
     print(f"Error al obtener los comandos: {e}")
@@ -156,6 +185,8 @@ def process_arguments(args: list[str]) -> dict:
     return {}
 
 
+# TODO FIX
+
 def _get_spreadsheet(
     spreadsheet_name: str, page_no: int
 ) -> gspread.worksheet.Worksheet | None:
@@ -178,15 +209,14 @@ def _get_spreadsheet(
 
     """
     try:
-        creds = Credentials.from_service_account_file(
-            SERVICE_ACCOUNT_FILE, scopes=SCOPES
-        )
+        creds = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
         client = gspread.authorize(creds)
 
         return client.open(spreadsheet_name).get_worksheet(page_no)
     except Exception as e:
         print(f"Fallo al intentar obtener el archivo: {e}")
         return
+
 
 
 def _get_mc_version(version: int) -> type[JavaServer] | type[BedrockServer] | None:
@@ -207,7 +237,7 @@ def _get_mc_version(version: int) -> type[JavaServer] | type[BedrockServer] | No
 
     """
     try:
-        mc_version = MC_VERSIONS.get(version)
+        mc_version = Version(version)
         if not mc_version:
             print("Ingresa una versión de Minecraft válida")
 
@@ -218,15 +248,15 @@ def _get_mc_version(version: int) -> type[JavaServer] | type[BedrockServer] | No
 
 
 # region Commands
-def check_server_status(server_name: str, m_version: int = 1) -> str:
+def check_server_status(server_name: str, m_version: int = 0) -> str:
     """Comprobar si el servidor está activo.
 
     Parameters
     ----------
     server_name : str
         Nombre del servidor
-    m_version : int
-        Versión de Minecraft. Puede ser `Java` o `Bedrock`. Default 1 (`Java`)
+    m_version : int = 0
+        Versión de Minecraft. Puede ser `Java` o `Bedrock`. Default 0 (`Java`)
 
     """
     input(f"{server_name = }\n{m_version = }")
@@ -243,15 +273,15 @@ def check_server_status(server_name: str, m_version: int = 1) -> str:
         return f"Servidor offline o inaccesible: {e}"
 
 
-def check_cur_players(server_name: str, m_version: int = 1) -> str:
+def check_cur_players(server_name: str, m_version: int = 0) -> str:
     """Obtener la cantidad de jugadores.
 
     Parameters
     ----------
     server_name : str
         Nombre del servidor
-    m_version : int
-        Versión de Minecraft. Puede ser `Java` o `Bedrock`. Default 1 (`Java`)
+    m_version : int = 0
+        Versión de Minecraft. Puede ser `Java` o `Bedrock`. Default 0 (`Java`)
 
     """
     input(f"{server_name = }\n{m_version = }")
@@ -272,16 +302,26 @@ def check_cur_players(server_name: str, m_version: int = 1) -> str:
         return f"Error al consultar jugadores: {e}"
 
 
-def save_coords(coords: list[str], page_no: int = 1) -> str:
-    return "OK"
+def coords_save(coords: str, dim: str = 0) -> str:
+    dimension = Dimension(int(dim))
+
+    with open(COORDS_CSV_PATH, "a", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow([*coords.split(","), dimension])
 
     try:
-        sheet = _get_spreadsheet(spreadsheet_name="", page_no=page_no)
-        if not sheet:
-            return "No se ha encontrado la página en la que insertar"
+        return f"Coordenadas guardadas: {coords} en {str(dimension)}"
+    except Exception as e:
+        return f"Error guardando coordenadas: {e}"
 
-        sheet.append_row(coords)
-        return f"Coordenadas guardadas: {coords} en {WORLD_PAGES.get(page_no)}"
+
+def coords_list() -> str:
+    with open(COORDS_CSV_PATH, encoding="utf-8") as f:
+        for row in csv.reader(f):
+            print(*row)
+
+    try:
+        return "Coordenadas leídas"
     except Exception as e:
         return f"Error guardando coordenadas: {e}"
 
@@ -343,5 +383,5 @@ def help(command_name: str | list = "") -> str:
 def init_console():
     """Initialize commands."""
     while not EXIT:
-        command = input("> ")
-        print(proccess_commands(command=command))
+        command = input("/")
+        print(proccess_commands(command=f"/{command}"))

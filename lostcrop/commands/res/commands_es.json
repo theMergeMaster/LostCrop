@@ -23,9 +23,9 @@
             "_description": "Versión de Minecraft en la que está el server.\n\tPuede ser Java o Bedrock (Java por defecto)."
         }
     },
-    "save_coords": {
-        "_alias": "sac",
-        "_description": "Guarda las coordenadas deseadas en un Google Sheets.",
+    "coords_save": {
+        "_alias": "cl",
+        "_description": "Guarda las coordenadas deseadas en un CSV.",
         "coords": {
             "structure": [-1, -1, -1],
             "required": 1,
@@ -35,6 +35,10 @@
             "required": 0,
             "_description": "Página en la que almacenar la coordenada, siendo:\n\t1 -> overworld, 2 -> nether, 3 -> end, n -> hojas temporales."
         }
+    },
+    "coords_list": {
+        "_alias": "cs",
+        "_description": "TODO"
     },
     "help": {
         "_description": "Muestra información de un comando específico o de todos.",
