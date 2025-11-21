@@ -202,7 +202,7 @@ wheels = [
 [[package]]
 name = "lostcrop"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "asyncio-dgram" },
     { name = "cachetools" },
@@ -220,7 +220,6 @@ dependencies = [
     { name = "requests" },
     { name = "requests-oauthlib" },
     { name = "rsa" },
-    { name = "setuptools" },
     { name = "urllib3" },
 ]
 
@@ -248,7 +247,6 @@ requires-dist = [
     { name = "requests", specifier = "==2.32.5" },
     { name = "requests-oauthlib", specifier = "==2.0.0" },
     { name = "rsa", specifier = "==4.9.1" },
-    { name = "setuptools", specifier = "==80.9.0" },
     { name = "urllib3", specifier = "==2.5.0" },
 ]
 

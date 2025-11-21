@@ -1,6 +1,7 @@
 import json
 import os
 from pathlib import Path
+import sys
 from types import SimpleNamespace
 
 import gspread
@@ -19,7 +20,7 @@ EXIT = False
 SERVICE_ACCOUNT_FILE = os.environ.get("GOOGLE_SERVICE_ACCOUNT_FILE")
 if not SERVICE_ACCOUNT_FILE or not os.path.isfile(SERVICE_ACCOUNT_FILE):
     print("No existen las credenciales de acceso")
-    # exit()
+    # sys.exit()
 
 # Lang
 LANG = "es"
@@ -31,7 +32,7 @@ if not (
     )
 ) or not os.path.isfile(commands_file):
     print("Error al obtener los comandos.")
-    exit()
+    sys.exit()
 
 try:
     commands = {}
@@ -45,7 +46,7 @@ try:
     COMMANDS = SimpleNamespace(**commands)
 except Exception as e:
     print(f"Error al obtener los comandos: {e}")
-    exit()
+    sys.exit()
 # endregion
 
 
@@ -344,7 +345,3 @@ def init_console():
     while not EXIT:
         command = input("> ")
         print(proccess_commands(command=command))
-
-
-if __name__ == "__main__":
-    init_console()

@@ -1,0 +1,21 @@
+# IDEs
+.vscode/
+.idea/
+
+# Environments
+.env
+.envrc
+.venv
+env/
+venv/
+
+# caches
+__pycache__/
+.pytest_cache/
+.ruff_cache
+
+# Artifacts
+*.log
+*.sqlite3
+*.egg-info
+.coverage
