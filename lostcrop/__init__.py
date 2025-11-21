@@ -1,0 +1,1 @@
+from lostcrop.commands import init_console as init_console
